@@ -18,3 +18,7 @@ $app->group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function(
 	]);
 
 });
+
+$app->get('/{url}', [
+	'as' => 'redirect', 'uses' => 'App\Http\Controllers\LinkController@redirect'
+]);
