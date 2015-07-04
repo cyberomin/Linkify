@@ -51,7 +51,8 @@ class LinkController extends Controller
 			$code = "";
 			$link = Links::create(['url' => $request->url, 'code' => $code]);
 
-			$code = base_convert($link->id + 10000, 10, 36);
+
+			$code = base_convert($link->id + rand(10000,100000), 10, 36);
 			$link = Links::whereUrl($url)->update([
 				'code' => $code
 			]);
@@ -92,5 +93,16 @@ class LinkController extends Controller
 			$result['message'] = $message;
 		}
 		return $result;
+	}
+
+	/**
+	 * Redirect to the URL
+	 * @param  string $code URL hash
+	 * @return [type]       [description]
+	 */
+	public function redirect($code) 
+	{
+		$link = Links::whereCode($code)->first();
+		header("Location:" . $link->url);
 	}
 }
