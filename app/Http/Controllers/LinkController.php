@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Links;
+use Illuminate\Http\Request;
 
 class LinkController extends Controller
 {
@@ -16,16 +17,21 @@ class LinkController extends Controller
 	public function show() 
 	{
 		$links = Links::all();
-		return response()->json(['status' => self::SUCCESS, 'data' => $links], self::OK);
+		$result = [
+			'status' => self::SUCCESS, 
+			'data' => [ 'links' => $links]
+		];
+		return response()->json($result, self::OK);
 	}
 
-	public function create() 
+	/**
+	 * Create a new URL
+	 * @return Response
+	 */
+	public function create(Request $request) 
 	{
-		$link = new Links;
-    	$link->code = "y3g44";
-	    $link->url = "http://man.com";
-	    $link->save();
+		if (empty(trim($request->url))) {
 
-	    return "All done";
+		}
 	}
 }
