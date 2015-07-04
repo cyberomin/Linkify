@@ -17,13 +17,24 @@ class LinkController extends Controller
 	 * Show all URLs
 	 * @return Response
 	 */
-	public function show() 
+	public function show(Request $request) 
 	{
-		$links = Links::all();
-		foreach ($links as $link) {
-			$link['short_url'] = env('BASE_URL') ."/". $link->code;
+		$limit = isset($request->limit) ? : 1;
+		$links = Links::paginate(2);
+		$data = $links->toArray()['data'];
+
+		$paginate = [
+			'total_count' => $links->total(),
+			'total_pages' => ceil($links->total() / $links->perPage()),
+			'current_page' => $links->currentPage(),
+			'limit' => $links->perPage()
+		];
+
+		for ($i = 0; $i < count($data); $i++) {
+			$data[$i]['short_url'] = env('BASE_URL') ."/". $data[$i]['code'];
 		}
-		$result = $this->getResult(self::SUCCESS, self::OK, ['links' => $links]);
+		
+		$result = $this->getResult(self::SUCCESS, self::OK, ['links' => $data], null,  $paginate);
 		return response()->json($result, self::OK);
 	}
 
@@ -79,7 +90,7 @@ class LinkController extends Controller
 	 * @param  string     $message error message
 	 * @return array      $result
 	 */
-	public function getResult($status, $code, array $data = null, $message = null) 
+	public function getResult($status, $code, array $data = null, $message = null, array $paginate = null) 
 	{
 		$result = [];
 		$result['status'] = $status;
@@ -91,6 +102,10 @@ class LinkController extends Controller
 		
 		if (!is_null($message)) {
 			$result['message'] = $message;
+		}
+
+		if (!is_null($paginate)) {
+			$result['paginator'] = $paginate;
 		}
 		return $result;
 	}

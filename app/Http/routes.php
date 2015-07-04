@@ -13,6 +13,9 @@ $app->group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function(
     	'as' => 'links', 'uses' => 'LinkController@show'
 	]);
 
+    /**
+     * Create a new link
+     */
 	$app->post('links', [
     	'as' => 'create', 'uses' => 'LinkController@create'
 	]);
