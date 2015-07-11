@@ -10,6 +10,13 @@ $app->group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function(
 	 * Get all the available URLS
 	 */
     $app->get('links', [
+    	'as' => 'links', 'uses' => 'LinkController@showAll'
+	]);
+
+	/**
+	 * Get the url with this hash
+	 */
+    $app->get('links/{code}', [
     	'as' => 'links', 'uses' => 'LinkController@show'
 	]);
 
@@ -18,6 +25,13 @@ $app->group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function(
      */
 	$app->post('links', [
     	'as' => 'create', 'uses' => 'LinkController@create'
+	]);
+
+	/**
+	 * Delete the url with this hash
+	 */
+    $app->delete('links/{code}', [
+    	'as' => 'links', 'uses' => 'LinkController@delete'
 	]);
 
 });

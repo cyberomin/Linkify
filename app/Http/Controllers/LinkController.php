@@ -9,7 +9,9 @@ class LinkController extends Controller
 {
 	const OK 			= 200;
 	const CREATED 		= 201;
+	const CONTENT_NOT_FOUND = 204;
 	const BAD_REQUEST 	= 400;
+	const NOT_FOUND 	= 404;
 	const SUCCESS 		= 'success';
 	const ERROR 		= 'error';
 
@@ -17,7 +19,7 @@ class LinkController extends Controller
 	 * Show all URLs
 	 * @return Response
 	 */
-	public function show(Request $request) 
+	public function showAll(Request $request) 
 	{
 		$limit = isset($request->limit) ? : 1;
 		$links = Links::paginate(2);
@@ -36,6 +38,45 @@ class LinkController extends Controller
 		
 		$result = $this->getResult(self::SUCCESS, self::OK, ['links' => $data], null,  $paginate);
 		return response()->json($result, self::OK);
+	}
+
+	/**
+	 * Show url with this code
+	 * @param  [type] $code [description]
+	 * @return [type]       [description]
+	 */
+	public function show($code)
+	{
+		$link = Links::whereCode($code)->first();
+		if ($link) {
+
+			$data = ['hash' => $link->code, 'url' => env('BASE_URL') ."/". $link->code, 'long_url' => $link->url ];
+			$result = $this->getResult(self::SUCCESS, self::OK, $data, null);
+			return response()->json($result, self::OK);
+		}
+
+		$result = $this->getResult(self::ERROR, self::NOT_FOUND, null, 'Item was not found');
+		return response()->json($result, self::NOT_FOUND);
+	}
+
+	/**
+	 * Delete URL
+	 * @param  [type] $code [description]
+	 * @return [type]       [description]
+	 */
+	public function delete($code)
+	{
+		$link = Links::whereCode($code)->first();
+		if ($link) {
+
+			$link->delete();
+			$data = ['message' => 'Item has been deleted'];
+			$result = $this->getResult(self::SUCCESS, self::CONTENT_NOT_FOUND, $data);
+			return response()->json($result, self::OK);
+		}
+
+		$result = $this->getResult(self::ERROR, self::NOT_FOUND, null, 'Item was not found');
+		return response()->json($result, self::NOT_FOUND);
 	}
 
 	/**
@@ -72,7 +113,7 @@ class LinkController extends Controller
 		$code = isset($code) ?  $code : $link->code;
 		$data = [
 			'link' => [
-				'code' => $code, 
+				'hash' => $code, 
 				'url' => env('BASE_URL') ."/". $code,
 				'long_url' => $url
 			]
