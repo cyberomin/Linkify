@@ -21,22 +21,12 @@ class LinkController extends Controller
 	 */
 	public function showAll(Request $request) 
 	{
-		$limit = isset($request->limit) ? : 1;
-		$links = Links::paginate(2);
-		$data = $links->toArray()['data'];
-
-		$paginate = [
-			'total_count' => $links->total(),
-			'total_pages' => ceil($links->total() / $links->perPage()),
-			'current_page' => $links->currentPage(),
-			'limit' => $links->perPage()
-		];
-
-		for ($i = 0; $i < count($data); $i++) {
-			$data[$i]['short_url'] = env('BASE_URL') ."/". $data[$i]['code'];
+		$links = Links::all();
+		foreach($links as $link) {
+			$link['short_url'] = stripslashes(env('BASE_URL') ."/". $link->code);
 		}
 		
-		$result = $this->getResult(self::SUCCESS, self::OK, ['links' => $data], null,  $paginate);
+		$result = $this->getResult(self::SUCCESS, self::OK, ['links' => $links]);
 		return response()->json($result, self::OK);
 	}
 
